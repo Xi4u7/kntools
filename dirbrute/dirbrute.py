@@ -15,16 +15,20 @@ try:
 except:
 	thread = 8
 try:
+	delay = sys.argv[5]
+except:
+	delay = 8
+try:
 	path = sys.argv[2]
 	list = sys.argv[1]
 except:
-	print("No Args!! Command:\n	# args 1 = list site\n	# args 2 = list path\n	# args 3 = Set Thread\n	# Set Output Name\n\n	Example Command:\n	- python2.7 dirbrute.py sites.txt path.txt\n	- python2.7 dirbrute.py sites.txt path.txt 8 output.txt")
+	print("No Args!! Command:\n	# args 1 = list site\n	# args 2 = list path\n	# args 3 = Set Thread\n	# args 4 = Set Output Name\n	# args 5 = Time Out\n\n	Example Command:\n	- python2.7 dirbrute.py sites.txt path.txt\n	- python2.7 dirbrute.py sites.txt path.txt 8 output.txt 30")
 	exit()
 
 def main(url, path):
 	try:
 		header = {"User-agent":"Linux Mozilla 5/0"}
-		request = requests.get(url+path, headers=header)
+		request = requests.get(url+path, headers=header, timeout=delay)
 		if request.status_code == 200:
 			print("\033[32;1m[200] "+url+path+"\033[0m")
 			save.write(url+path+"\n")
