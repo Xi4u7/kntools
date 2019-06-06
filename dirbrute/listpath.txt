@@ -1,0 +1,3 @@
+/home.php
+/admin/login.php
+/wp/wp-config.php
