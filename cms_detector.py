@@ -72,7 +72,11 @@ try:
 	def do_stuff(q):
 		while not q.empty():
 			value = q.get()
-			main(value)
+			if value.startswith("http://") or value.startswith("https://"):
+				main(value)
+			else:
+				value2 = "http://"+value
+				main(value2)
 			q.task_done()
 			
 	for trgt in asu:
