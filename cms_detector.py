@@ -1,7 +1,9 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
-import requests, urlparse, sys
+import requests, re, sys, threading, threading, time, random
+from Queue import Queue
+requests.packages.urllib3.disable_warnings()
 
 wp = open("wordpress.txt", "a")
 jm = open("joomla.txt","a")
@@ -21,49 +23,65 @@ def main(url):
                 finaly = url
                 html = requests.get(finaly, headers=header, timeout=timeout).text
                 if "component" in html and "com_" in html:
-                        print("[+] "+finaly+" -> Joomla")
+                        print("\033[32;1m[+] "+finaly+" -> Joomla")
                         if finaly in jmc:
-                                print(" | Already Added In List")
+                                print(" \033[31;1m| Already Added In List")
                         else:
                                 jm.write(finaly+"\n")
                                 print(" | Added To List")
                 elif "/wp-content/" in html:
-                        print("[+] "+finaly+" -> Wordpress")
+                        print("\033[32;1m[+] "+finaly+" -> Wordpress")
                         if finaly in wpc:
-                                print(" | Already Added In List")
+                                print(" \033[31;1m| Already Added In List")
                         else:
                                 wp.write(finaly+"\n")
                                 print(" | Added To List")
                 elif "/sites/default/" in html:
-                        print("[+] "+finaly+" -> Drupal")
+                        print("\033[32;1m[+] "+finaly+" -> Drupal")
                         if finaly in drc:
-                                print(" | Already Added In List")
+                                print(" \033[31;1m| Already Added In List")
                         else:
                                 dr.write(finaly+"\n")
                                 print(" | Added To List")
                 elif "prestashop" in html:
-                        print("[+] "+finaly+" -> PrestaShop")
+                        print("\033[32;1m[+] "+finaly+" -> PrestaShop")
                         if finaly in psc:
-                                print(" | Already Added In List")
+                                print(" \033[31;1m| Already Added In List")
                         else:
                                 ps.write(finaly+"\n")
                                 print(" | Added To List")
                 else:
-                        print("[+] "+finaly+" -> Other")
+                        print("\033[33;1m[+] "+finaly+" -> Other")
                         if finaly in otherc:
-                                print(" | Already Added In List")
+                                print(" \033[31;1m| Already Added In List")
                         else:
                                 other.write(finaly+"\n")
                                 print(" | Added To List")
         except Exception as err:
                 print("[!] Exception Error!")
-
-list = raw_input("[?] List Of Website : ")
-ab = open(list,"r")
-for i in ab:
-        asu = i.replace("\n","")
-        if asu.startswith("http://") or asu.startswith("https://"):
-        	main(asu)
-        else:
-        	gas = "http://" + asu
-        	main(gas)
+        	
+try:
+	list = sys.argv[1]
+except:
+	print("python2.7 eval-stdin.py list.txt")
+	exit()
+	
+try:
+	asu = open(list).read().splitlines()
+	jobs = Queue()
+	def do_stuff(q):
+		while not q.empty():
+			value = q.get()
+			main(value)
+			q.task_done()
+			
+	for trgt in asu:
+		jobs.put(trgt)
+	
+	for i in range(100):
+		worker = threading.Thread(target=do_stuff, args=(jobs,))
+		worker.start()
+	jobs.join()
+except KeyboardInterrupt:
+	print("CTRL + C Closed")
+	exit()
