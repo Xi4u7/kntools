@@ -9,6 +9,7 @@ wp = open("wordpress.txt", "a")
 jm = open("joomla.txt","a")
 dr = open("drupal.txt","a")
 ps = open("prestashop.txt","a")
+mg = open("magento.txt","a")
 other = open("other.txt","a")
 
 def main(url):
@@ -18,6 +19,7 @@ def main(url):
         jmc = open("joomla.txt").read()
         drc = open("drupal.txt").read()
         psc = open("prestashop.txt").read()
+        mgc = open("magento.txt").read()
         otherc = open("other.txt").read()
         try:
                 finaly = url
@@ -28,6 +30,7 @@ def main(url):
                                 print(" \033[31;1m| Already Added In List")
                         else:
                                 jm.write(finaly+"\n")
+                                jm.close()
                                 print(" | Added To List")
                 elif "/wp-content/" in html:
                         print("\033[32;1m[+] "+finaly+" -> Wordpress")
@@ -35,6 +38,7 @@ def main(url):
                                 print(" \033[31;1m| Already Added In List")
                         else:
                                 wp.write(finaly+"\n")
+                                wp.close()
                                 print(" | Added To List")
                 elif "/sites/default/" in html:
                         print("\033[32;1m[+] "+finaly+" -> Drupal")
@@ -42,6 +46,15 @@ def main(url):
                                 print(" \033[31;1m| Already Added In List")
                         else:
                                 dr.write(finaly+"\n")
+                                dr.close()
+                                print(" | Added To List")
+                elif "skin/frontend/" in html:
+                        print("\033[32;1m[+] "+finaly+" -> Magento")
+                        if finaly in mgc:
+                                print(" \033[31;1m| Already Added In List")
+                        else:
+                                mg.write(finaly+"\n")
+                                mg.close()
                                 print(" | Added To List")
                 elif "prestashop" in html:
                         print("\033[32;1m[+] "+finaly+" -> PrestaShop")
@@ -49,6 +62,7 @@ def main(url):
                                 print(" \033[31;1m| Already Added In List")
                         else:
                                 ps.write(finaly+"\n")
+                                ps.close()
                                 print(" | Added To List")
                 else:
                         print("\033[33;1m[+] "+finaly+" -> Other")
@@ -56,9 +70,10 @@ def main(url):
                                 print(" \033[31;1m| Already Added In List")
                         else:
                                 other.write(finaly+"\n")
+                                other.close()
                                 print(" | Added To List")
         except Exception as err:
-                print("[!] Exception Error!")
+                print("\033[34m[!] Exception Error!\033[0m")
         	
 try:
 	list = sys.argv[1]
