@@ -17,7 +17,7 @@ user = "admin403" # Change If You Want
 pwd = "JancoxSc0de"
 head = {"User-agent":"Linux Mozilla 5/0"}
 urlsym1 = raw_input("urlsym > ")
-urlsym = urlsym+"/"
+urlsym = urlsym1+"/"
 api = raw_input("urlapi > ")
 text1 = requests.get(urlsym, headers=head).text
 list = re.findall('</td><td><a href="(.*?)">', text1)
