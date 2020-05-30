@@ -1,106 +1,167 @@
-#!/usr/bin/python
-# -*- coding: UTF-8 -*-
+# -*- coding: utf-8 -*-
 
-import requests, re, sys, threading, threading, time, random
+import sys, requests, re, time, os
+from ConfigParser import ConfigParser
 from Queue import Queue
-requests.packages.urllib3.disable_warnings()
+from threading import Thread
 
-wp = open("wordpress.txt", "a")
-jm = open("joomla.txt","a")
-dr = open("drupal.txt","a")
-ps = open("prestashop.txt","a")
-mg = open("magento.txt","a")
-other = open("other.txt","a")
+try:
+	os.mkdir("cms")
+except:
+	pass
+
+""" Configure Headers """
+header = {"User-agent":"Linux Mozilla 7.0"}
+pid_restore = ".cmsscanner.session"
+
+
+class Worker(Thread):
+	def __init__(self, tasks):
+		Thread.__init__(self)
+		self.tasks = tasks
+		self.daemon = True
+		self.start()
+
+	def run(self):
+		while True:
+			func, args, kargs = self.tasks.get()
+			try: func(*args, **kargs)
+			except Exception, e: print e
+			self.tasks.task_done()
+
+class ThreadPool:
+	def __init__(self, num_threads):
+		self.tasks = Queue(num_threads)
+		for _ in range(num_threads): Worker(self.tasks)
+
+	def add_task(self, func, *args, **kargs):
+		self.tasks.put((func, args, kargs))
+
+	def wait_completion(self):
+		self.tasks.join()
 
 def main(url):
-        timeout = 15
-        header = {"User-agent":"Linux Mozilla 5/0"} # Change User-agent if you want
-        wpc = open("wordpress.txt").read()
-        jmc = open("joomla.txt").read()
-        drc = open("drupal.txt").read()
-        psc = open("prestashop.txt").read()
-        mgc = open("magento.txt").read()
-        otherc = open("other.txt").read()
-        try:
-                finaly = url
-                html = requests.get(finaly, headers=header, timeout=timeout).text
-                if "component" in html and "com_" in html:
-                        print("\033[32;1m[+] "+finaly+" -> Joomla")
-                        if finaly in jmc:
-                                print(" \033[31;1m| Already Added In List")
-                        else:
-                                jm.write(finaly+"\n")
-                                jm.close()
-                                print(" | Added To List")
-                elif "/wp-content/" in html:
-                        print("\033[32;1m[+] "+finaly+" -> Wordpress")
-                        if finaly in wpc:
-                                print(" \033[31;1m| Already Added In List")
-                        else:
-                                wp.write(finaly+"\n")
-                                wp.close()
-                                print(" | Added To List")
-                elif "/sites/default/" in html:
-                        print("\033[32;1m[+] "+finaly+" -> Drupal")
-                        if finaly in drc:
-                                print(" \033[31;1m| Already Added In List")
-                        else:
-                                dr.write(finaly+"\n")
-                                dr.close()
-                                print(" | Added To List")
-                elif "skin/frontend/" in html:
-                        print("\033[32;1m[+] "+finaly+" -> Magento")
-                        if finaly in mgc:
-                                print(" \033[31;1m| Already Added In List")
-                        else:
-                                mg.write(finaly+"\n")
-                                mg.close()
-                                print(" | Added To List")
-                elif "prestashop" in html:
-                        print("\033[32;1m[+] "+finaly+" -> PrestaShop")
-                        if finaly in psc:
-                                print(" \033[31;1m| Already Added In List")
-                        else:
-                                ps.write(finaly+"\n")
-                                ps.close()
-                                print(" | Added To List")
-                else:
-                        print("\033[33;1m[+] "+finaly+" -> Other")
-                        if finaly in otherc:
-                                print(" \033[31;1m| Already Added In List")
-                        else:
-                                other.write(finaly+"\n")
-                                other.close()
-                                print(" | Added To List")
-        except Exception as err:
-                print("\033[34m[!] Exception Error!\033[0m")
-        	
-try:
-	list = sys.argv[1]
-except:
-	print("python2.7 eval-stdin.py list.txt")
-	exit()
-	
-try:
-	asu = open(list).read().splitlines()
-	jobs = Queue()
-	def do_stuff(q):
-		while not q.empty():
-			value = q.get()
-			if value.startswith("http://") or value.startswith("https://"):
-				main(value)
+	try:
+		s = requests.Session()
+		req = s.get(url, headers=header)
+		html = req.text
+		if "laravel" in str(req.headers):
+			nama = "Laravel"
+			w = open("cms/"+nama+".txt","a")
+			r = open("cms/"+nama+".txt").read()
+			if url in r:
+				print(url+" -> \033[31;1m"+nama+"\033[0m")
 			else:
-				value2 = "http://"+value
-				main(value2)
-			q.task_done()
-			
-	for trgt in asu:
-		jobs.put(trgt)
-	
-	for i in range(100):
-		worker = threading.Thread(target=do_stuff, args=(jobs,))
-		worker.start()
-	jobs.join()
-except KeyboardInterrupt:
-	print("CTRL + C Closed")
-	exit()
+				print(url+" -> \033[32;1m"+nama+"\033[0m")
+				w.write(url+"\n")
+			w.close()
+		elif "/wp-content/" in html:
+			nama = "Wordpress"
+			w = open("cms/"+nama+".txt","a")
+			r = open("cms/"+nama+".txt").read()
+			if url in r:
+				print(url+" -> \033[31;1m"+nama+"\033[0m")
+			else:
+				print(url+" -> \033[32;1m"+nama+"\033[0m")
+				w.write(url+"\n")
+			w.close()
+		elif "component" in html and "com_" in html:
+			nama = "Joomla"
+			w = open("cms/"+nama+".txt","a")
+			r = open("cms/"+nama+".txt").read()
+			if url in r:
+				print(url+" -> \033[31;1m"+nama+"\033[0m")
+			else:
+				print(url+" -> \033[32;1m"+nama+"\033[0m")
+				w.write(url+"\n")
+			w.close()
+		elif "/sites/default/" in html:
+			nama = "Drupal"
+			w = open("cms/"+nama+".txt","a")
+			r = open("cms/"+nama+".txt").read()
+			if url in r:
+				print(url+" -> \033[31;1m"+nama+"\033[0m")
+			else:
+				print(url+" -> \033[32;1m"+nama+"\033[0m")
+				w.write(url+"\n")
+			w.close()
+		elif "skin/frontend/" in html:
+			nama = "Magento"
+			w = open("cms/"+nama+".txt","a")
+			r = open("cms/"+nama+".txt").read()
+			if url in r:
+				print(url+" -> \033[31;1m"+nama+"\033[0m")
+			else:
+				print(url+" -> \033[32;1m"+nama+"\033[0m")
+				w.write(url+"\n")
+			w.close()
+		elif "prestashop" in html:
+			nama = "PrestaShop"
+			w = open("cms/"+nama+".txt","a")
+			r = open("cms/"+nama+".txt").read()
+			if url in r:
+				print(url+" -> \033[31;1m"+nama+"\033[0m")
+			else:
+				print(url+" -> \033[32;1m"+nama+"\033[0m")
+				w.write(url+"\n")
+			w.close()
+		else:
+			nama = "Other"
+			w = open("cms/"+nama+".txt","a")
+			r = open("cms/"+nama+".txt").read()
+			if url in r:
+				print(url+" -> \033[31;1m"+nama+"\033[0m")
+			else:
+				print(url+" -> \033[33;1m"+nama+"\033[0m")
+				w.write(url+"\n")
+			w.close()
+	except:
+		pass
+
+if __name__ == '__main__':
+	try:
+		readcfg = ConfigParser()
+		readcfg.read(pid_restore)
+		lists = readcfg.get('DB', 'FILES')
+		numthread = readcfg.get('DB', 'THREAD')
+		sessi = readcfg.get('DB', 'SESSION')
+		print("log session bot found! restore session")
+		print('''Using Configuration :\n\tFILES='''+lists+'''\n\tTHREAD='''+numthread+'''\n\tSESSION='''+sessi)
+		tanya = raw_input("Want to contineu session ? [Y/n] ")
+		if "Y" in tanya or "y" in tanya:
+			lerr = open(lists).read().split(sessi)[1]
+			readsplit = lerr.splitlines()
+		else:
+			kntl # Send Error Biar Lanjut Ke Wxception :v
+	except:
+		try:
+			lists = sys.argv[1]
+			numthread = sys.argv[2]
+			readsplit = open(lists).read().splitlines()
+		except:
+			try:
+				lists = raw_input("websitelist ? ")
+				numthread = raw_input("threads ? ")
+				readsplit = open(lists).read().splitlines()
+			except:
+				print("\nCheck our lists and try again!")
+				exit()
+
+	pool = ThreadPool(int(numthread))
+	for url in readsplit:
+		jagases = url
+		if "://" in url:
+			url = url
+		else:
+			url = "http://"+url
+		try:
+			pool.add_task(main, url)
+		except KeyboardInterrupt:
+			session = open(pid_restore, 'w')
+			cfgsession = "[DB]\nFILES="+lists+"\nTHREAD="+str(numthread)+"\nSESSION="+jagases+"\n"
+			session.write(cfgsession)
+			session.close()
+			print("CTRL+C Detect, Session saved")
+			exit()
+	pool.wait_completion()
+	os.remove(pid_restore)
