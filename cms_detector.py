@@ -43,7 +43,7 @@ class ThreadPool:
 def main(url):
 	try:
 		s = requests.Session()
-		req = s.get(url, headers=header)
+		req = s.get(url, headers=header, timeout=8)
 		html = req.text
 		if "laravel" in str(req.headers):
 			nama = "Laravel"
