@@ -45,7 +45,7 @@ def main(url):
 		s = requests.Session()
 		req = s.get(url, headers=header, timeout=8)
 		html = req.text
-		if "laravel" in str(req.headers):
+		if "=eyJ" in str(req.headers) or "XSRF-TOKEN" in str(req.headers):
 			nama = "Laravel"
 			w = open("cms/"+nama+".txt","a")
 			r = open("cms/"+nama+".txt").read()
