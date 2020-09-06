@@ -6,6 +6,8 @@ for i in text.splitlines():
 	try:
 		asu = i.split(',')
 		f = asu.replace('"','')
-		print(str(asu))
+		s = open('results.txt','a')
+		s.write(str(f))
+		s.close()
 	except:
 		continue
