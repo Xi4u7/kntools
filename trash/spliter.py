@@ -4,7 +4,7 @@ import sys
 text = open(sys.argv[1]).read()
 for i in text.splitlines():
 	try:
-		asu = i.split(',')
+		asu = i.split(',')[1]
 		f = asu.replace('"','')
 		s = open('results.txt','a')
 		s.write(str(f))
