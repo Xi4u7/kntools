@@ -40,6 +40,10 @@ class ThreadPool:
 	def wait_completion(self):
 		self.tasks.join()
 
+def printf(text):
+	''.join([str(item) for item in text])
+	print(text + '\n'),
+
 def main(url):
 	try:
 		s = requests.Session()
@@ -50,9 +54,9 @@ def main(url):
 			w = open("cms/"+nama+".txt","a")
 			r = open("cms/"+nama+".txt").read()
 			if url in r:
-				print(url+" -> \033[31;1m"+nama+"\033[0m")
+				printf(url+" -> \033[31;1m"+nama+"\033[0m")
 			else:
-				print(url+" -> \033[32;1m"+nama+"\033[0m")
+				printf(url+" -> \033[32;1m"+nama+"\033[0m")
 				w.write(url+"\n")
 			w.close()
 		elif "/wp-content/" in html:
@@ -60,9 +64,9 @@ def main(url):
 			w = open("cms/"+nama+".txt","a")
 			r = open("cms/"+nama+".txt").read()
 			if url in r:
-				print(url+" -> \033[31;1m"+nama+"\033[0m")
+				printf(url+" -> \033[31;1m"+nama+"\033[0m")
 			else:
-				print(url+" -> \033[32;1m"+nama+"\033[0m")
+				printf(url+" -> \033[32;1m"+nama+"\033[0m")
 				w.write(url+"\n")
 			w.close()
 		elif "component" in html and "com_" in html:
@@ -70,9 +74,9 @@ def main(url):
 			w = open("cms/"+nama+".txt","a")
 			r = open("cms/"+nama+".txt").read()
 			if url in r:
-				print(url+" -> \033[31;1m"+nama+"\033[0m")
+				printf(url+" -> \033[31;1m"+nama+"\033[0m")
 			else:
-				print(url+" -> \033[32;1m"+nama+"\033[0m")
+				printf(url+" -> \033[32;1m"+nama+"\033[0m")
 				w.write(url+"\n")
 			w.close()
 		elif "/sites/default/" in html:
@@ -80,9 +84,9 @@ def main(url):
 			w = open("cms/"+nama+".txt","a")
 			r = open("cms/"+nama+".txt").read()
 			if url in r:
-				print(url+" -> \033[31;1m"+nama+"\033[0m")
+				printf(url+" -> \033[31;1m"+nama+"\033[0m")
 			else:
-				print(url+" -> \033[32;1m"+nama+"\033[0m")
+				printf(url+" -> \033[32;1m"+nama+"\033[0m")
 				w.write(url+"\n")
 			w.close()
 		elif "skin/frontend/" in html:
@@ -90,9 +94,9 @@ def main(url):
 			w = open("cms/"+nama+".txt","a")
 			r = open("cms/"+nama+".txt").read()
 			if url in r:
-				print(url+" -> \033[31;1m"+nama+"\033[0m")
+				printf(url+" -> \033[31;1m"+nama+"\033[0m")
 			else:
-				print(url+" -> \033[32;1m"+nama+"\033[0m")
+				printf(url+" -> \033[32;1m"+nama+"\033[0m")
 				w.write(url+"\n")
 			w.close()
 		elif "prestashop" in html:
@@ -100,9 +104,9 @@ def main(url):
 			w = open("cms/"+nama+".txt","a")
 			r = open("cms/"+nama+".txt").read()
 			if url in r:
-				print(url+" -> \033[31;1m"+nama+"\033[0m")
+				printf(url+" -> \033[31;1m"+nama+"\033[0m")
 			else:
-				print(url+" -> \033[32;1m"+nama+"\033[0m")
+				printf(url+" -> \033[32;1m"+nama+"\033[0m")
 				w.write(url+"\n")
 			w.close()
 		else:
@@ -110,12 +114,15 @@ def main(url):
 			w = open("cms/"+nama+".txt","a")
 			r = open("cms/"+nama+".txt").read()
 			if url in r:
-				print(url+" -> \033[31;1m"+nama+"\033[0m")
+				printf(url+" -> \033[31;1m"+nama+"\033[0m")
 			else:
-				print(url+" -> \033[33;1m"+nama+"\033[0m")
+				printf(url+" -> \033[33;1m"+nama+"\033[0m")
 				w.write(url+"\n")
 			w.close()
 	except:
+		w = open("cms/EXCEPTION_SITES.txt","a")
+		w.write(url + '\n')
+		w.close(abs)
 		pass
 
 if __name__ == '__main__':
@@ -125,8 +132,8 @@ if __name__ == '__main__':
 		lists = readcfg.get('DB', 'FILES')
 		numthread = readcfg.get('DB', 'THREAD')
 		sessi = readcfg.get('DB', 'SESSION')
-		print("log session bot found! restore session")
-		print('''Using Configuration :\n\tFILES='''+lists+'''\n\tTHREAD='''+numthread+'''\n\tSESSION='''+sessi)
+		printf("log session bot found! restore session")
+		printf('''Using Configuration :\n\tFILES='''+lists+'''\n\tTHREAD='''+numthread+'''\n\tSESSION='''+sessi)
 		tanya = raw_input("Want to contineu session ? [Y/n] ")
 		if "Y" in tanya or "y" in tanya:
 			lerr = open(lists).read().split(sessi)[1]
@@ -144,7 +151,7 @@ if __name__ == '__main__':
 				numthread = raw_input("threads ? ")
 				readsplit = open(lists).read().splitlines()
 			except:
-				print("\nCheck our lists and try again!")
+				printf("\nCheck our lists and try again!")
 				exit()
 
 	pool = ThreadPool(int(numthread))
@@ -161,7 +168,10 @@ if __name__ == '__main__':
 			cfgsession = "[DB]\nFILES="+lists+"\nTHREAD="+str(numthread)+"\nSESSION="+jagases+"\n"
 			session.write(cfgsession)
 			session.close()
-			print("CTRL+C Detect, Session saved")
+			printf("CTRL+C Detect, Session saved")
 			exit()
 	pool.wait_completion()
-	os.remove(pid_restore)
+	try:
+		os.remove(pid_restore)
+	except:
+		pass
