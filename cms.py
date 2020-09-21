@@ -122,7 +122,7 @@ def main(url):
 	except:
 		w = open("cms/EXCEPTION_SITES.txt","a")
 		w.write(url + '\n')
-		w.close(abs)
+		w.close()
 		pass
 
 if __name__ == '__main__':
