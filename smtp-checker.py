@@ -19,7 +19,11 @@ def cek(host,port,user,pwd, email_to):
 		pack = (host+"|"+str(port)+"|"+user+"|"+pwd)
 		smtpserver = smtplib.SMTP(host,int(port),timeout=10)
 		smtpserver.ehlo()
-		smtpserver.starttls()
+		try:
+			smtpserver.starttls()
+			ssl = '\033[32;1mTrue\033[0m'
+		except:
+			ssl = '\033[32;1mFalse\033[0m'
 		smtpserver.ehlo()
 		smtpserver.login(user,pwd)
 		header = 'To:' + email_to + '\n' + 'From: ' + user + '\n' + 'Subject: SMTP Worked!\n'
@@ -27,9 +31,9 @@ def cek(host,port,user,pwd, email_to):
 		smtpserver.sendmail(user, email_to, msg)
 		smtpserver.close()
 		smtp_worked = smtp_worked + 1
-		info += ' -> \033[32;1mSMTP Worked\033[0m'
+		info += ' -> \033[32;1mSMTP Worked\033[0m -> SSL: '+str(ssl)
 		saveresult = open("Results/smtp_worked.txt","a")
-		saveresult.write(pack+"\n")
+		saveresult.write(pack+"|"+str(ssl)+"\n")
 		saveresult.close()
 	except KeyboardInterrupt:
 		print("Closed")
